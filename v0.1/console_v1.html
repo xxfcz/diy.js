@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>跨浏览器的 console </title>
+    <script src="lib/console_v1.js"></script>
+    <script>
+        console1.log('在 head 中输出会报错！');
+    </script>
+</head>
+<body>
+<div>请在IE6-8中查看此页面。</div>
+<script>
+    console1.log('我也能用 console.log() 了！');
+</script>
+</body>
+</html>
