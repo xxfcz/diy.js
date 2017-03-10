@@ -5,15 +5,23 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
     <title>跨浏览器的 console </title>
     <link rel="stylesheet" type="text/css" href="lib/console.css">
+    <script type="text/javascript">
+        var hasBuiltInConsole = typeof window.console !== 'undefined';
+    </script>
     <script src="lib/console.js"></script>
     <script>
-        console.log('这是在 head 中输出的内容。');
+        if (hasBuiltInConsole)
+            document.write('这个浏览器有内置控制台，请按F12看输出。<br/>要看模拟效果，可使用IE6-9。<hr/>');
+        else
+            document.write('使用模拟的console。<hr/>');
+
+        console.log('这一行是在 head 中输出的。');
     </script>
 </head>
 <body>
-<div>请在IE6-8中查看此页面。</div>
 <script>
     console.log('我也能用 console.log() 了！');
+    console.info('这一行是用 info() 输出的。');
 </script>
 </body>
 </html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>assert()</title>
+    <link rel="stylesheet" type="text/css" href="lib/console.css">
+    <script src="lib/console.js"></script>
+    <script src="lib/assert.js"></script>
+    <script>
+        console.log('使用原版：v1.assert()');
+        try {
+            v1.assert(true, '恭喜你，答对了 :-D');
+            v1.assert(false, '对不起，你答错了 :-(');
+        }
+        catch (e) {
+        }
+
+        console.log('使用改版：v2.assert()');
+        v2.assert(true, '恭喜你，答对了 :-D');
+        v2.assert(false, '对不起，你答错了 :-(');
+    </script>
+</head>
+<body>
+</body>
+</html>

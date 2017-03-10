@@ -23,7 +23,14 @@
                 type: 'info',
                 text: [].slice.call(arguments).join(' ')
             });
+        },
+        error: function () {
+            logs.push({
+                type: 'error',
+                text: [].slice.call(arguments).join(' ')
+            });
         }
+        // TODO: 有没有嗅到 bad smile?
     };
 
     // 正本
@@ -42,10 +49,18 @@
             var el = document.createElement('div');
             el.innerText = text;
             el.className = 'console info';
-            el.style.color = 'blue';
+            document.body.appendChild(el);
+            return el;
+        },
+        error: function () {
+            var text = [].slice.call(arguments).join(' ');
+            var el = document.createElement('div');
+            el.innerText = text;
+            el.className = 'console error';
             document.body.appendChild(el);
             return el;
         }
+        // TODO: 有没有嗅到 bad smile?
     };
 
     // 还没有 body
@@ -67,6 +82,10 @@
                     case 'info':
                         console2.info(log.text);
                         break;
+                    case 'error':
+                        console2.error(log.text);
+                        break;
+                    // TODO: 有没有嗅到 bad smile?
                     default:
                         break;
                 }
