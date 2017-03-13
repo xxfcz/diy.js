@@ -40,3 +40,23 @@ $是个好东西，大家都喜欢:-)。
 
 extend()的完整实现见于 lib/core.js 的 `$.extend()` 。注意，我借用了 Nicholas C. Zakas 《Professional JavaScript for Web Developers》（中译名：JavaScript高级程序设计）中的实现。
 
+
+类型判断
+======
+
+`typeof`、`instanceof`有严重缺陷，不宜拿来作为框架的基础。其典型缺陷如 typeof-instanceof.html 所示。主要有以下几点：
+
+1. `typeof` 只能判断 number、boolean、string、function、object、undefined 这6种基本情形，不能对object进一步区分
+（这种区分基本上可由 instanceof 完成，但如下文所述，也存在缺陷）。
+2. 于是，`typeof` 会把 new Number() 、new String() 等判断为 `object`，这是正确的，但没有意义。
+3. `typeof` 在某些浏览器中会误判：把&lt;embed>、&lt;object>、&lt;applet> 等 HTMLElement 类型的`object` 当成`function`。
+4. `typeof` 会把 window.alert 等 `function` 判断为 `object`。
+5. 在IE7－中，window、document 的 constructor 没有暴露出来，`typeof` 判断为undefined。
+6. 在IE中，ActiveX 对象的 constructor 也没有暴露出来；而它们的方法会被 `typeof` 判断为object。
+7. 目前各浏览器都实现了 document.all，但 `typeof` 却判断为 undefined。
+8. 在IE8－中，instanceof 不认为 NodeList、HTMLCollection 等的实例是 Object。
+9. 另外，在IE8－中，`window == document` 结果居然为 `true`。 
+
+
+接下来，先对 $.isXXX() 系列函数挨个实现，如$.isNumber()、$.isNodeList()等等，再统一实现一个 $.type()，
+详见 lib/core.js。测试页面是 isX-type.html。

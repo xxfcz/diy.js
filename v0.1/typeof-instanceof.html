@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>typeof、instanceof 的陷阱</title>
+    <link rel="stylesheet" type="text/css" href="lib/utest.css">
+    <script type="text/javascript" src="lib/utest.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            var ut = new Utest();
+            ut.print('========================= typeof 的陷阱 =============================');
+            ut.print('typeof null:', typeof null);
+            ut.print('typeof document.images:', typeof document.images);
+            ut.print('typeof document.childNodes:', typeof document.childNodes, '【Safari: function】');
+            ut.print("typeof document.createElement('embed'):", typeof document.createElement('embed'), '【FireFox/Opera: function】');
+            ut.print("typeof document.createElement('object'):", typeof document.createElement('object'), '【FireFox/Opera: function】');
+            ut.print("typeof document.createElement('applet'):", typeof document.createElement('applet'), '【FireFox10－: function】');
+            ut.print('typeof window.alert:', typeof window.alert, '【IE6－8: object】');
+
+
+            ut.print('========================= instanceof 的陷阱 =============================');
+            ut.print('/\d/i instanceof RegExp:', /\d/i instanceof RegExp);
+            ut.print('document.images [HTMLCollection] instanceof Object ? ', document.images instanceof Object, '【IE8－: false（WRONG!）】');
+            ut.print('[NodeList] instanceof Object ?', document.getElementsByName('div') instanceof Object, '【IE8－: false（WRONG!）】');
+            ut.print('window == document ?', window == document, '【IE8－: true（WRONG!）】');
+            ut.print('window != document ?', window != document);
+            ut.print('document == window ?', document == window, '【false】');
+            ut.print("typeof document.all === 'undefined' ?", typeof document.all === 'undefined');
+            ut.print('typeof document.all :', typeof document.all);
+            ut.print('document.all.length = ', document.all.length);
+            ut.print('typeof window.dispatchEvent :', typeof window.dispatchEvent, '【IE8－: undefined】');
+
+            ut.print('========================= 其它陷阱 =============================');
+
+            ut.print('typeof window.constructor:', typeof window.constructor, '【IE7－: undefined】');
+            ut.print('typeof document.constructor:', typeof document.constructor, '【IE7－: undefined】');
+            ut.print('typeof document.body.constructor:', typeof document.body.constructor, '【IE7－: undefined】');
+            try {
+                xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                ut.print('typeof (new ActiveXObject("Microsoft.XMLHTTP")).abort = ', typeof xhr.abort);
+                ut.print('typeof (new ActiveXObject("Microsoft.XMLHTTP")).constructor = ', typeof xhr.constructor, '【IE: undefined】');
+            }
+            catch (ex) {
+                ut.print('Not IE，no ActiveXObject');
+            }
+            ut.print('NaN === NaN?', NaN === NaN);
+            ut.print('NaN !== NaN?', NaN !== NaN);
+        }
+    </script>
+</head>
+<body>
+<h1>typeof、instanceof 的陷阱</h1>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>类型检测</title>
+    <link type="text/css" rel="stylesheet" href="./lib/utest.css">
+    <script type="text/javascript" src="./lib/utest.js"></script>
+    <script type="text/javascript" src="./lib/core.js"></script>
+    <script>
+        window.onload = function () {
+            var ut = new Utest();
+
+            ut.print("isNaN('abc'):", isNaN('abc'));
+            ut.print('正则表达式：', /test/i.toString());
+            ut.print('document.toString():', document.toString());
+            ut.print('Object.prototype.toString.call(document):', Object.prototype.toString.call(document));
+            ut.print('document.images.toString():', document.images.toString());
+            ut.print("document.getElementsByName('div').toString():", document.getElementsByName('div').toString());
+            ut.print('Object.prototype.toString.call([]):', Object.prototype.toString.call([]));
+            ut.print('typeof 1:', typeof 1);
+            ut.print('typeof new Number():', typeof new Number());
+            ut.print('Object.prototype.toString.call(new Number()):', Object.prototype.toString.call(new Number()));
+
+
+            ut.print('*********************************************************');
+            ut.print('以下用 $.isXXX() 判断类型');
+            ut.print('*********************************************************');
+
+            ut.assert($.isNull(null) === true, '$.isNull(null) === true');
+            ut.assert($.isNull(undefined) === false, '$.isNull(undefined) === false');
+            ut.assert($.isNull(NaN) === false, '$.isNull(NaN) === false');
+            ut.assert($.isNull(0) === false, '$.isNull(0) === false');
+            ut.assert($.isNull(10) === false, '$.isNull(10) === false');
+            ut.assert($.isNull(-3.14) === false, '$.isNull(-3.14) === false');
+            ut.assert($.isNull('Abc') === false, '$.isNull("abc") === false');
+            ut.assert($.isNull({ x: 1, y: 2 }) === false, '$.isNull({x:1, y:2}) === false');
+            ut.assert($.isUndefined(null) === false, '$.isUndefined(null) === false');
+            ut.assert($.isUndefined(undefined) === true, '$.isUndefined(undefined) === true');
+            ut.assert($.isUndefined(NaN) === false, '$.isUndefined(NaN) === false');
+            ut.assert($.isUndefined(0) === false, '$.isUndefined(0) === false');
+            ut.assert($.isUndefined(void 0) === true, '$.isUndefined(void 0) === true');
+            ut.assert($.isUndefined('Abc') === false, '$.isUndefined("abc") === false');
+            ut.assert($.isUndefined({ x: 1, y: 2 }) === false, '$.isUndefined({x:1, y:2}) === false');
+
+            ut.assert(null === null, 'null === null');
+            ut.assert(NaN !== NaN, 'NaN !== NaN');
+            ut.assert($.isNaN(NaN), '$.isNaN(NaN) === true');
+            ut.assert(!$.isNaN(10), '$.isNaN(10) === false');
+            ut.assert(!$.isNaN('abc'), '$.isNaN("abc") === false');
+            ut.assert(!$.isNaN({ x: 1, y: 2 }), '$.isNaN({x:1, y:2}) === false');
+
+            ut.assert($.isNumber(1), ' 1  是 Number');
+            var objN = new Number(10);
+            ut.assert($.isNumber(objN), 'new Number()  是  Number');
+            ut.assert(!$.isNumber(null), 'null 不 是  Number');
+            ut.assert(!$.isNumber(NaN), 'NaN 不 是  Number');
+            ut.assert(!$.isNumber(undefined), 'undefined 不 是  Number');
+
+            ut.assert($.isBoolean(true), 'true  是  Boolean');
+            ut.assert($.isBoolean(new Boolean()), 'new Boolean()  是  Boolean');
+            ut.assert(!$.isBoolean(1), '1 不 是  Boolean');
+
+            ut.assert($.isString('abc'), "'abc' 是 String");
+            ut.assert(!$.isString(123), '123 不 是  String');
+
+            var f1 = function () { };
+            ut.assert($.isFunction(f1));
+            ut.assert(!$.isFunction(23));
+
+            ut.assert($.isArray([]), '[] 是 Array');
+            ut.assert(!$.isArray({}), '{} 不是 Array');
+
+            ut.assert($.isDate(new Date()), 'new Date() 是 Date');
+            var x = new Date('abcdi');
+            ut.print('typeof new Date("abcdi"):', typeof x);
+            ut.assert(!$.isDate(new Date('abcdi')), "new Date('abcdi') 不是 Date");
+            ut.assert(!$.isDate('2012-5-3'), "'2012-5-3' 不是 Date");
+
+            ut.assert($.isRegExp(/abc/i));
+            ut.assert(!$.isRegExp('abc/i'));
+
+            ut.print('typeof window:', typeof window);
+            ut.print('Object.prototype.toString.call(window):', Object.prototype.toString.call(window));
+
+            ut.assert($.isWindow(window), "window 是 Window");
+            ut.assert(!$.isWindow(document), 'document 不是 Window');
+            ut.assert($.isDocument(document), 'document 是 Document');
+            ut.assert($.isFunction(function () {}), 'function () {} 是函数');
+
+            ut.print('document.images:', Object.prototype.toString.call(document.images));
+            ut.print('document.images.item:', Object.prototype.toString.call(document.images.item));
+            ut.assert($.isNodeList(document.images), '$.isNodeList(document.images)');
+            ut.assert($.isNodeList(document.getElementsByName('div')), "$.isNodeList(document.getElementsByName('div'))");
+            if (document.querySelectorAll)
+                ut.assert($.isNodeList(document.querySelectorAll('div>p')), "$.isNodeList(document.querySelectorAll('div>p'))");
+
+            ut.assert($.isArrayLike([]), '[] 是 类数组');
+            ut.assert($.isArrayLike(arguments), 'arguments 是 类数组');
+            ut.assert($.isArrayLike(document.images), 'document.images 是 类数组');
+            ut.assert($.isArrayLike(document.getElementsByName('div')), 'getElementsByName() 是 类数组');
+
+
+            ut.print('*************************************************************');
+            ut.print('以下用 $.type() 判断类型');
+            ut.print('*************************************************************');
+            ut.assert($.type(null, 'Null'), 'type(null) 是 Null');
+            ut.assert($.type(undefined, 'Undefined'), 'undefined 是 Undefined');
+            ut.assert($.type(1, 'Number'), '1 是 Number');
+            ut.assert($.type(1) == 'Number', '1 是 Number');
+            ut.assert($.type({}, 'Object'), '{} 是 Object');
+            ut.assert($.type([], 'Array'), '[] 是 Array');
+            ut.assert($.type(new Date()) === 'Date', 'new Date() 是 Date');
+            ut.assert(!$.type(new Date('abcdi'), 'Date'), "new Date('abcdi') 不是 Date");
+            ut.assert(!$.type('2012-5-3', 'Date'), "'2012-5-3' 不是 Date");
+            ut.assert($.type(function () {}, 'Function'), 'function () {} 是函数');
+            ut.assert($.type(window, 'Window'), 'window 是 Window');
+            ut.assert($.type(document, 'Document'), 'document 是 Document');
+            ut.assert($.type(document.images, 'NodeList'), 'document.images 是 NodeList');
+            ut.assert($.type(document.getElementsByName('div'), 'NodeList'), 'document.getElementsByName() 是 NodeList');
+            if (document.querySelectorAll)
+                ut.assert($.type(document.querySelectorAll('div'), 'NodeList'), 'document.querySelectorAll() 是 NodeList');
+            (function () {
+                ut.assert($.type(arguments, 'Arguments'), 'arguments 是 Arguments');
+            })();
+        };
+    </script>
+</head>
+<body>
+</body>
+</html>
