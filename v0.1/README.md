@@ -74,3 +74,14 @@ DOM Ready
 至于种子模块动态加载的情形，暂不处理了，以后再说。
 
 实现代码见于 lib/core.js 的 `$.ready()` 。测试页面是 dom-ready.html。
+
+
+模块加载器
+========
+
+首先要能确定当前脚本文件的URL。此处借用的 getCurrentScript()函数：
+
+
+
+
+但是

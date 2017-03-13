@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>loadJS()</title>
+    <link rel="stylesheet" type="text/css" href="../lib/console.css">
+    <script type="text/javascript" src="../lib/console.js"></script>
+    <script type="text/javascript" src="./lib/core.js"></script>
+    <script type="text/javascript">
+        $._loadJS('./js/script-1.js', function () {
+            console.log('这是HTML页面中，对应于 script-1.js 的回调函数。')
+        });
+        $._loadJS('./js/script-2.js', function () {
+            console.log('这是HTML页面中，对应于 script-2.js 的回调函数。')
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

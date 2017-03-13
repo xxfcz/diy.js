@@ -1,0 +1,13 @@
+.console{
+   &.log{
+      color: gray;
+   }
+
+   &.info{
+      color: blue;
+   }
+
+   &.error{
+      color: red;
+   }
+}
