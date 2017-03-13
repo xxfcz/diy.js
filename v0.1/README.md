@@ -79,9 +79,10 @@ DOM Ready
 模块加载器
 ========
 
-首先要能确定当前脚本文件的URL。此处借用的 getCurrentScript()函数：
+首先需要一个函数来动态加载指定的JavaScript文件：`loadJS(url, cb)`。
 
+然后需要能确定当前脚本文件的URL，此处借用 Samy Kamkar 所写的[jiagra](https://github.com/samyk/jiagra/)
+中的`getCurrentScript()`函数。
 
+接下来可以开始写加载器主函数`$.require()`：
 
-
-但是

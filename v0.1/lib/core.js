@@ -375,16 +375,8 @@
             state: STATE_LOADING
         };
 
-        // 没有依赖项，或者此刻已经完全安装了所有依赖项？
-        if (dn === 0 || cn === dn) {
-            fireFactory(id, factory);
-        }
-        else {
-            console.log(id + ' 有依赖项尚未安装，计 ' + (dn - cn) + '/' + dn);
-            // 放入检测队列，待 checkDeps() 处理
-            loadings.unshift(id);
-        }
-        checkDeps(id + ' 发起依赖检测');
+        if (factory)
+            factory();
     };
 
     function getCurrentScript(base) {
@@ -422,60 +414,6 @@
 
     $._getCurrentScript = getCurrentScript;
 
-    /**
-     * @summary 安装模块#id
-     * @description 请求模块从modules对象取得依赖列表中的各模块的返回值，执行factory, 完成模块的安装
-     * @param {String} id  模块ID
-     * @param {Function} factory 模块工厂
-     * @api private
-     */
-    function fireFactory(id, factory) {
-        var mod = modules[id];
-        var deps = mod.deps;
-        var args = [];
-        // 取各依赖项的导出值
-        for (var key in deps) {
-            if (deps.hasOwnProperty(key)) {
-                args.push(modules[key].exports);
-            }
-        }
-        var ret = factory.apply(global, args);
-        if (ret !== void 0) {
-            mod.exports = ret;  // 本模块导出值
-            console.log(id + '模块导出值：', ret);
-        }
-        mod.state = STATE_LOADED;
-        return ret;
-    }
-
-    function checkDeps(msg) {
-        for (var i = loadings.length, id; id = loadings[--i]; i >= 0) {
-            //检测此JS模块的依赖是否都已安装完毕,是则安装自身
-            var obj = modules[id],
-                deps = obj.deps,
-                allLoaded = true;
-            for (var key in deps) {
-                if (Object.prototype.hasOwnProperty.call(deps, key) && modules[key].state !== STATE_LOADED) {
-                    allLoaded = false;
-                    break;
-                }
-            }
-
-            if (allLoaded && obj.state !== STATE_LOADED) {
-                console.log('模块加载成功：', obj.id);
-                loadings.splice(i, 1); //必须先移除再安装，防止在IE下DOM树建完后手动刷新页面，会多次执行它
-                fireFactory(obj.id, obj.factory);
-                checkDeps(obj.id + ' 已安装成功,但再执行一次');//如果成功,则再执行一次,以防有些模块就差本模块没有安装好
-            }
-        }
-    }
-
-    $.define = function (name, deps, factory) {
-        // define 本质上就是 require
-        var id = getCurrentScript();
-        console.log('【定义模块】：name=' + name + ', file=' + id);
-        $.require(deps, factory, id);
-    };
 
     //</editor-fold>
 
