@@ -50,6 +50,40 @@
         };
     }());
 
+    /**
+     * 数组化
+     * @param {ArrayLike} nodes 要处理的类数组对象
+     * @param {Number} start 可选。要抽取的片断的起始下标。如果是负数，从后面取起
+     * @param {Number} end  可选。规定从何处结束选取
+     * @return {Array}
+     * @api public
+     */
+    $.slice = W3C ? function (nodes, start, end) {
+        return [].slice.call(nodes, start, end);
+    } : _slice;
+
+    function _slice(nodes, start, end) {
+        var ret = [],
+            n = nodes.length;
+        if (end === void 0 || typeof end === "number" && isFinite(end)) {
+            start = parseInt(start, 10) || 0;
+            end = end == void 0 ? n : parseInt(end, 10);
+            if (start < 0) {
+                start += n;
+            }
+            if (end > n) {
+                end = n;
+            }
+            if (end < 0) {
+                end += n;
+            }
+            for (var i = start; i < end; ++i) {
+                ret[i - start] = nodes[i];
+            }
+        }
+        return ret;
+    }
+
     // <editor-fold desc="Type checking">
 
     $.isNull = function (o) {
@@ -259,7 +293,7 @@
     //</editor-fold>
 
     //<editor-fold desc="Module loader">
-
+    var MODULE_CLASS = "xlib" + (new Date - 0);
     var STATE_LOADING = 1, STATE_LOADED = 2;
     var modules = {};   // 定义的模块列表
     var loadings = [];  // 正在加载的模块
@@ -307,16 +341,14 @@
         return src;
     }
 
-    $.require = function (list, factory, parent) {
+    $.require = function (list, factory) {
         var deps = {};
         var i;
         var dn = 0; // 需安装的依赖项个数
         var cn = 0; // 已安装的依赖项个数
-        // parent = parent || basepath;
         // 起个没什么意义的名字，但不能重复
         var loc = String(document.location).replace(/[?#].*/, "");
-        var id = parent || loc + '_cb' + setTimeout(function () { });
-        //var name = id.
+        var id = loc + '_cb' + setTimeout(function () { });
 
         // 对每一个依赖项
         for (i = 0; i < list.length; ++i) {
@@ -343,12 +375,8 @@
             state: STATE_LOADING
         };
 
-
+        // 没有依赖项，或者此刻已经完全安装了所有依赖项？
         if (dn === 0 || cn === dn) {
-            if (dn === 0)
-                console.log(id + ' 没有依赖项。');
-            else
-                console.log(id + ' 完全安装了依赖项，共计 ' + cn);
             fireFactory(id, factory);
         }
         else {
@@ -361,11 +389,11 @@
 
     function getCurrentScript(base) {
         // 参考 https://github.com/samyk/jiagra/blob/master/jiagra.js
-        var stack;
+        var stack, ret;
         try {
             a.b.c(); //强制报错,以便捕获e.stack
         } catch (e) { //safari的错误对象只有line,sourceId,sourceURL
-            stack = e.stack;
+            stack = e.stack; // IE9- 的 Error 没有 stack 属性
             if (!stack && window.opera) {
                 //opera 9没有e.stack,但有e.Backtrace,但不能直接取得,需要对e对象转字符串进行抽取
                 stack = (String(e).match(/of linked script \S+/g) || []).join(" ");
@@ -374,52 +402,25 @@
         if (stack) {
             stack = stack.split(/[@ ]/g).pop(); //取得最后一行,最后一个空格或@之后的部分
             stack = stack[0] === "(" ? stack.slice(1, -1) : stack.replace(/\s/, ""); //去掉换行符
-            return stack.replace(/(:\d+)?:\d+$/i, ""); //去掉行号与或许存在的出错字符起始位置
+            ret = stack.replace(/(:\d+)?:\d+$/i, ""); //去掉行号与或许存在的出错字符起始位置
         }
-        // else {
-        //     console.log('NO Stack!');
-        // }
-        var nodes = (base ? document : head).getElementsByTagName("script"); //只在head标签中寻找
-        for (var i = nodes.length, node; node = nodes[--i];) {
-            if ((base || node.className === moduleClass) && node.readyState === "interactive") {
-                return node.className = node.src;  // 替换掉class，防止以后被误伤
+        if (!ret) {
+            var nodes = (base ? document : head).getElementsByTagName("script"); //只在head标签中寻找
+            for (var i = nodes.length, node; node = nodes[--i];) {
+                if ((base || node.className === MODULE_CLASS) && node.readyState === "interactive") {
+                    ret = node.className = node.src;  // 替换掉class，防止以后被误伤
+                }
             }
         }
-
-        return $.slice(document.scripts).pop().src;
+        if (!ret)
+            ret = $.slice(document.scripts).pop().src;
+        if (!ret) {
+            ret = document.location.href; // 实在不行，就取当前的URL
+        }
+        return ret ? ret.replace(/[?#].*/, '') : '';  // 去掉末尾的hash分片和查询字符串
     }
 
     $._getCurrentScript = getCurrentScript;
-
-    var rdeuce = /\/\w+\/\.\./;
-
-    function makeFullPath(url, parent) {
-        var ret;
-        if (/^(\w+)(\d)?:.*/.test(url)) { //如果本来就是完整路径
-            ret = url;
-        } else {
-            //parent = parent ? parent.substr(0, parent.lastIndexOf('/')) : basepath;
-            parent = parent.substr(0, parent.lastIndexOf('/'));
-            var tmp = url.charAt(0);
-            if (tmp !== "." && tmp !== "/") { //相对于根路径
-                ret = basepath + url;
-            } else if (url.slice(0, 2) === "./") { //相对于兄弟路径
-                ret = parent + url.slice(1);
-            } else if (url.slice(0, 2) === "..") { //相对于父路径
-                ret = parent + "/" + url;
-                while (rdeuce.test(ret)) {
-                    ret = ret.replace(rdeuce, "")
-                }
-            } else if (tmp === "/") {
-                ret = parent + url;//相对于兄弟路径
-            } else {
-                console.error("不符合模块标识规则: " + url);
-            }
-        }
-        return ret;
-    }
-
-    $._makeFullPath = makeFullPath;
 
     /**
      * @summary 安装模块#id
@@ -447,13 +448,6 @@
         return ret;
     }
 
-    $.define = function (name, deps, factory) {
-        // define 本质上就是 require
-        var id = getCurrentScript();
-        console.log('【定义模块】：name=' + name + ', file=' + id);
-        $.require(deps, factory, id);
-    };
-
     function checkDeps(msg) {
         for (var i = loadings.length, id; id = loadings[--i]; i >= 0) {
             //检测此JS模块的依赖是否都已安装完毕,是则安装自身
@@ -475,6 +469,13 @@
             }
         }
     }
+
+    $.define = function (name, deps, factory) {
+        // define 本质上就是 require
+        var id = getCurrentScript();
+        console.log('【定义模块】：name=' + name + ', file=' + id);
+        $.require(deps, factory, id);
+    };
 
     //</editor-fold>
 
