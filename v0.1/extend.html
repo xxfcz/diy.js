@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>extend</title>
+    <link type="text/css" rel="stylesheet" href="lib/utest.css">
+    <script type="text/javascript" src="./lib/utest.js"></script>
+    <script type="text/javascript" src="./lib/core.js"></script>
+</head>
+<body>
+<script>
+    var ut = new Utest();
+
+    var o1 = {
+        x: 1,
+        toString: '(x: 1)',
+        foo: 'I think, therefore I am.'
+    };
+
+    var o2 = {
+        x: 10,
+        y: 20,
+        toString: '(x: 10, y: 20)'
+    };
+
+    var o3 = $.extend(o1, o2);
+    ut.print('o3：', JSON.stringify(o3));
+</script>
+</body>
+</html>

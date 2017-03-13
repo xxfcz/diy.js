@@ -1,0 +1,10 @@
+.utest .log {
+  background-color: #bababa; }
+.utest .pass {
+  background-color: green;
+  color: white; }
+.utest .fail {
+  background-color: red;
+  color: white; }
+
+/*# sourceMappingURL=utest.css.map */
