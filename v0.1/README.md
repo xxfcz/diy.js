@@ -140,4 +140,14 @@ body中的输出正常，但是head中的会报错：
 结果请看 assert.html。
 
 
-有了 assert()，接下来要稍微扩展一下，也算是个简陋的测试框架。
+有了 assert()，接下来要稍微扩展一下，也算是个简陋的测试框架。实现代码位于 lib/utest.js、lib/utest.scss。有了它，以后就可以这样做实验了：
+
+
+        var ut = new Utest();
+        ut.print('描述性的一行文本。');
+        ut.assert(true, '这一行通过了！');
+        ut.assert(false, '这一行没通过！');
+
+
+完整示例位于 utest.html。
+
