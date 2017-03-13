@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>for-in</title>
+</head>
+<body>
+<h1> IE6-8 的 for-in 有 bug</h1>
+<div>背景：toString、valueOf、constructor、hasOwnProperty等属性是 Object.prototype 中有定义的。</div>
+<hr>
+<div id="normal">这是个比较正常的浏览器，不会忽略 toString、valueOf 等与特殊属性同名的自定义属性。</div>
+<div id="abnormal">这个浏览器不太正常，如果对象的自定义属性也取名为 toString、valueOf 等特殊名称，则会被 for-in 循环忽略。</div>
+<script>
+    var isNormalBrowser = false;
+    for (var i in { toString: null }) {
+        // 如果到了这里，说明浏览器是正常的，不会忽略 toString 等特殊名字的属性
+        isNormalBrowser = true;
+        document.getElementById('normal').style.display = 'block';
+        document.getElementById('abnormal').style.display = 'none';
+    }
+    if (!isNormalBrowser) {
+        document.getElementById('normal').style.display = 'none';
+        document.getElementById('abnormal').style.display = 'block';
+    }
+</script>
+</body>
+</html>

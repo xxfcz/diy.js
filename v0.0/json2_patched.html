@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>打了补丁后的 JSON2</title>
+    <script type="text/javascript" src="./lib/console.js"></script>
+    <script type="text/javascript" src="./lib/json2.js"></script>
+</head>
+<body>
+<h1>打了补丁后的 JSON2</h1>
+<script>
+
+    var o = {
+        x: 10,
+        y: 20,
+        valueOf: '(x: 1, y: 2)'
+    };
+
+    console.log('JSON.stringify 结果：' + JSON.stringify(o));
+
+</script>
+</body>
+</html>
