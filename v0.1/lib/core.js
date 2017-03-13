@@ -314,8 +314,8 @@
             if (cb)
                 cb();
         };
-        node.onerror = function () {
-            console.log('加载时出错：', url);
+        node.onerror = function (e) {
+            console.log('加载时出错：', url, '；错误：', arguments);
         };
         node.src = url;
         node.className = MODULE_CLASS;
@@ -327,7 +327,18 @@
 
     function loadExternal(url) {
         // TODO: 路径补全；别名转换
-        var src = url.replace(/[?#].*/, ""); // 清除尾上的 ? # 等串
+        var src = url;
+        // 不是完整URL？
+        if (!/^(\w+)(\d)?:.*/.test(src)) {
+            var scriptFile = getCurrentScript(true);
+            // 相对路径？相对于当前脚本的位置
+            if (src[0] !== '/') {
+                var path = scriptFile.substring(0, scriptFile.lastIndexOf('/') + 1);
+                src = path + src;
+            }
+        }
+
+        src = src.replace(/[?#].*/, ""); // 清除尾上的 ? # 等串
 
         // 该依赖项还从未加载过吗？
         if (!modules[src]) {

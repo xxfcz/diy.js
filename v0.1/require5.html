@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
-    <title>加载器测试1：一层依赖项</title>
+    <title>加载器测试5：包含'..'、'.'的相对路径</title>
     <link rel="stylesheet" type="text/css" href="../lib/console.css">
     <script type="text/javascript" src="../lib/console.js"></script>
     <script type="text/javascript" src="lib/core.js"></script>
     <script>
-        $.require(['/diy.js/v0.1/js/script-1.js', '/diy.js/v0.1/js/script-2.js'], function () {
-            console.log('我依赖于 script-1.js 和 script-2.js，但它们不再有依赖。');
+        // TODO: 处理包含'..'、'.'的相对路径
+        $.require(['../v0.1/js/mod3.js'], function (ret1) {
+            console.log('【HTML页面】使用相对路径。结果：', ret1);
         });
     </script>
 </head>
 <body>
-<h1>加载器测试1：一层依赖项</h1>
+<h1>加载器测试5：处理包含'..'、'.'的相对路径</h1>
 </body>
 </html>
