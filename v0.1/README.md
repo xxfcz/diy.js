@@ -79,10 +79,209 @@ DOM Ready
 模块加载器
 ========
 
-首先需要一个函数来动态加载指定的JavaScript文件：`loadJS(url, cb)`。
+首先需要一个函数来动态加载指定的JavaScript文件：`loadJS(url, cb)`。其代码见 lib/core.js，测试页面是 load-js.html。
 
-然后需要能确定当前脚本文件的URL，此处借用 Samy Kamkar 所写的[jiagra](https://github.com/samyk/jiagra/)
+
+无依赖的情形
+----------
+
+接下来可以开始写最初的加载器主函数`$.require()`，只处理无依赖的情形。
+
+测试页面是 require0.html，测试代码如下：
+
+    $.require([], function () {
+        console.log('我没有依赖任何人！');
+    });
+
+`$.require()`实现如下：
+
+    $.require = function (list, factory) {
+        // 用当前URL起个没什么意义的名字，但不能重复
+        var loc = String(document.location).replace(/[?#].*/, "");
+        var id = loc + '_cb' + setTimeout(function () { });
+
+        if (factory)
+            factory();
+    };
+
+
+仅一层依赖的情形
+-------------
+
+接下来处理有一层依赖的情形，测试页面是 require1.html，测试代码如下：
+
+    <!-- require1.html -->
+    
+    $.require(['/diy.js/v0.1/js/script-1.js', '/diy.js/v0.1/js/script-2.js'], function () {
+        console.log('我依赖于 script-1.js 和 script-2.js，但它们不再依赖任何人！');
+    });
+
+注意，为简单起见，目前只使用绝对路径来指定依赖项。
+
+相应地，`$.require()`实现修改如下：
+
+    $.require = function (list, factory) {
+        var deps = {};
+        var i;
+        var dn = 0; // 需安装的依赖项个数
+        var cn = 0; // 已安装的依赖项个数
+        // 用当前URL起个没什么意义的名字，但不能重复
+        var loc = String(document.location).replace(/[?#].*/, "");
+        var id = loc + '_cb' + setTimeout(function () { });
+
+        // 对每一个依赖项
+        for (i = 0; i < list.length; ++i) {
+            var url = loadExternal(list[i]);
+            if (url) {
+                ++dn;
+                if (modules[url] && modules[url].state === STATE_LOADED) {
+                    console.log('真快！已加载：', url);
+                    ++cn;
+                }
+            }
+
+            if (!deps[url]) {
+                deps[url] = '肖雪峰';
+            }
+
+        }
+
+        //记录本模块的加载情况与其他信息
+        modules[id] = {
+            id: id,
+            factory: factory,
+            deps: deps,
+            state: STATE_LOADING
+        };
+
+        // 没有依赖项，或者此刻已经完全安装了所有依赖项？
+        if (dn === 0 || cn === dn) {
+            if (factory)
+                factory();
+        }
+        else {
+            console.log(id + ' 有依赖项尚未安装，计 ' + (dn - cn) + '/' + dn);
+        }
+    };
+    
+
+查看测试页面 require1.html，其输出如下：
+
+    正准备加载： /diy.js/v0.1/js/script-1.js
+    正准备加载： /diy.js/v0.1/js/script-2.js
+    http://localhost:63342/diy.js/v0.1/require1.html_cb1 有依赖项尚未安装，计 2/2
+    在 script-1.js 中，取到当前脚本文件为： http://localhost:63342/diy.js/v0.1/js/script-1.js
+    已成功加载： /diy.js/v0.1/js/script-1.js
+    在 script-2.js 中，取到当前脚本文件为： http://localhost:63342/diy.js/v0.1/js/script-2.js
+    已成功加载： /diy.js/v0.1/js/script-2.js
+
+可见，依赖项已全部加载，但没有执行页面中的回调函数。
+
+
+检查依赖项
+--------
+
+现在需要及时检查各模块的各依赖项的安装状态，若某个模块的所有依赖项已经就绪，则可以安装模块自己了：
+
+    function checkDeps(msg) {
+        for (var i = loadings.length, id; id = loadings[--i]; i >= 0) {
+            //检测此JS模块的依赖是否都已安装完毕,是则安装自身
+            var obj = modules[id],
+                deps = obj.deps,
+                allLoaded = true;
+            for (var key in deps) {
+                if (Object.prototype.hasOwnProperty.call(deps, key) && modules[key].state !== STATE_LOADED) {
+                    allLoaded = false;
+                    break;
+                }
+            }
+
+            if (allLoaded && obj.state !== STATE_LOADED) {
+                console.log('模块加载成功：', obj.id);
+                loadings.splice(i, 1); //必须先移除再安装，防止在IE下DOM树建完后手动刷新页面，会多次执行它
+                fireFactory(obj.id, obj.factory);
+                checkDeps(obj.id + ' 已安装成功,但再执行一次');//如果成功,则再执行一次,以防有些模块就差本模块没有安装好
+            }
+        }
+    }
+
+
+对 factory 函数的调用，抽取为新函数fireFactory()：
+
+    function fireFactory(id, factory) {
+        var mod = modules[id];
+        factory();                  // 执行回调函数
+        mod.state = STATE_LOADED;   // 标记该模块已安装成功
+    }
+
+
+安装模块自身
+----------
+
+为了安装模块自己，需要使用 define() 来定义模块。`$.define()`本质上就是`$.define()`，所以实现如下：
+
+    $.define = function (name, deps, factory) {
+        var id = getCurrentScript();
+        console.log('【定义模块】：name=' + name + ', file=' + id);
+        $.require(deps, factory, id);
+    };
+
+其中，为了确定当前脚本文件的URL，此处借用了 Samy Kamkar 所写的[jiagra](https://github.com/samyk/jiagra/)
 中的`getCurrentScript()`函数。
 
-接下来可以开始写加载器主函数`$.require()`：
+另外，由于目前是用脚本完整的URL作为模块的id，所以在$.require()中引用模块时也要填写完整的URL。例如在测试页面 require2.html 中：
+
+    <!-- require2.html -->
+    
+    // 暂时使用完整URL来引用模块
+    $.require(['http://localhost:63342/diy.js/v0.1/js/mod1.js'], function () {
+        console.log('【HTML页面】我依赖于 mod1.js，但它没有依赖项。');
+    });
+
+输出结果：
+
+    正准备加载： http://localhost:63342/diy.js/v0.1/js/mod1.js
+    http://localhost:63342/diy.js/v0.1/require1a.html_cb1 有依赖项尚未安装，计 1/1
+    【定义模块】：name=mod1, file=http://localhost:63342/diy.js/v0.1/js/mod1.js
+    http://localhost:63342/diy.js/v0.1/js/mod1.js 没有依赖项。
+    模块加载成功： http://localhost:63342/diy.js/v0.1/require1a.html_cb1
+    【HTML页面】我依赖于 mod1.js，但它没有依赖项。
+    已成功加载： http://localhost:63342/diy.js/v0.1/js/mod1.js
+
+
+测试多层依赖的表现
+--------------
+
+接下来增加依赖的层数，建立另一个模块 mod2.js，它依赖于 mod1.js：
+
+    /* mod2.js */
+    
+    $.define('mod2', ['http://localhost:63342/diy.js/v0.1/js/mod1.js'], function () {
+        return '我是模块2的返回值';
+    });
+
+
+测试页面 require3.html ：
+
+    <!-- require3.html -->
+    
+    $.require(['http://localhost:63342/diy.js/v0.1/js/mod2.js'], function () {
+        console.log('【HTML页面】我依赖 mod2.js，而它又依赖 mod1.js 。');
+    });
+
+
+输出结果：
+
+    正准备加载： http://localhost:63342/diy.js/v0.1/js/mod2.js
+    http://localhost:63342/diy.js/v0.1/require3.html_cb1 有依赖项尚未安装，计 1/1
+    【定义模块】：name=mod2, file=http://localhost:63342/diy.js/v0.1/js/mod2.js
+    正准备加载： http://localhost:63342/diy.js/v0.1/js/mod1.js
+    http://localhost:63342/diy.js/v0.1/js/mod2.js 有依赖项尚未安装，计 1/1
+    已成功加载： http://localhost:63342/diy.js/v0.1/js/mod2.js
+    【定义模块】：name=mod1, file=http://localhost:63342/diy.js/v0.1/js/mod1.js
+    http://localhost:63342/diy.js/v0.1/js/mod1.js 没有依赖项。
+    模块加载成功： http://localhost:63342/diy.js/v0.1/js/mod2.js
+    模块加载成功： http://localhost:63342/diy.js/v0.1/require3.html_cb1
+    【HTML页面】我依赖 mod2.js，而它又依赖 mod1.js 。
+    已成功加载： http://localhost:63342/diy.js/v0.1/js/mod1.js
 

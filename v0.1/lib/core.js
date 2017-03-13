@@ -318,7 +318,7 @@
             console.log('加载时出错：', url);
         };
         node.src = url;
-        //node.className = moduleClass;
+        node.className = MODULE_CLASS;
         head.appendChild(node);
         console.log('正准备加载：', url);
     }
@@ -341,14 +341,16 @@
         return src;
     }
 
-    $.require = function (list, factory) {
+    $.require = function (list, factory, parent) {
         var deps = {};
         var i;
         var dn = 0; // 需安装的依赖项个数
         var cn = 0; // 已安装的依赖项个数
+        // parent = parent || basepath;
         // 起个没什么意义的名字，但不能重复
         var loc = String(document.location).replace(/[?#].*/, "");
-        var id = loc + '_cb' + setTimeout(function () { });
+        var id = parent || loc + '_cb' + setTimeout(function () { });
+        //var name = id.
 
         // 对每一个依赖项
         for (i = 0; i < list.length; ++i) {
@@ -375,17 +377,93 @@
             state: STATE_LOADING
         };
 
-        if (factory)
-            factory();
+
+        if (dn === 0 || cn === dn) {
+            if (dn === 0)
+                console.log(id + ' 没有依赖项。');
+            else
+                console.log(id + ' 完全安装了依赖项，共计 ' + cn);
+            fireFactory(id, factory);
+        }
+        else {
+            console.log(id + ' 有依赖项尚未安装，计 ' + (dn - cn) + '/' + dn);
+            // 放入检测队列，待 checkDeps() 处理
+            loadings.unshift(id);
+        }
+        checkDeps(id + ' 发起依赖检测');
     };
+
+    /**
+     * 定义模块
+     * @param {string} name - 暂时无实际意义，给开发人员自己看而已
+     * @param {Array<string>} deps - 依赖项ID的列表
+     * @param {Function} factory - 模块工厂回调函数
+     */
+    $.define = function (name, deps, factory) {
+        // define 本质上就是 require
+        var id = getCurrentScript();
+        console.log('【定义模块】：name=' + name + ', file=' + id);
+        $.require(deps, factory, id);
+    };
+
+    function checkDeps(msg) {
+        for (var i = loadings.length, id; id = loadings[--i]; i >= 0) {
+            //检测此JS模块的依赖是否都已安装完毕,是则安装自身
+            var obj = modules[id],
+                deps = obj.deps,
+                allLoaded = true;
+            for (var key in deps) {
+                if (Object.prototype.hasOwnProperty.call(deps, key) && modules[key].state !== STATE_LOADED) {
+                    allLoaded = false;
+                    break;
+                }
+            }
+
+            if (allLoaded && obj.state !== STATE_LOADED) {
+                console.log('模块加载成功：', obj.id);
+                loadings.splice(i, 1); //必须先移除再安装，防止在IE下DOM树建完后手动刷新页面，会多次执行它
+                fireFactory(obj.id, obj.factory);
+                checkDeps(obj.id + ' 已安装成功,但再执行一次');//如果成功,则再执行一次,以防有些模块就差本模块没有安装好
+            }
+        }
+    }
+
+    /**
+     * @summary 安装模块#id
+     * @description 请求模块从modules对象取得依赖列表中的各模块的返回值，执行factory, 完成模块的安装
+     * @param {String} id  模块ID
+     * @param {Function} factory 模块工厂
+     * @api private
+     */
+    function fireFactory(id, factory) {
+        var mod = modules[id];
+        factory();
+/*
+        var deps = mod.deps;
+        var args = [];
+        // 取各依赖项的导出值
+        for (var key in deps) {
+            if (deps.hasOwnProperty(key)) {
+                args.push(modules[key].exports);
+            }
+        }
+        var ret = factory.apply(window, args);
+        if (ret !== void 0) {
+            mod.exports = ret;  // 本模块导出值
+            console.log(id + '模块导出值：', ret);
+        }
+*/
+        mod.state = STATE_LOADED;
+        //return ret;
+    }
 
     function getCurrentScript(base) {
         // 参考 https://github.com/samyk/jiagra/blob/master/jiagra.js
-        var stack, ret;
+        var stack;
         try {
             a.b.c(); //强制报错,以便捕获e.stack
         } catch (e) { //safari的错误对象只有line,sourceId,sourceURL
-            stack = e.stack; // IE9- 的 Error 没有 stack 属性
+            stack = e.stack;
             if (!stack && window.opera) {
                 //opera 9没有e.stack,但有e.Backtrace,但不能直接取得,需要对e对象转字符串进行抽取
                 stack = (String(e).match(/of linked script \S+/g) || []).join(" ");
@@ -394,26 +472,22 @@
         if (stack) {
             stack = stack.split(/[@ ]/g).pop(); //取得最后一行,最后一个空格或@之后的部分
             stack = stack[0] === "(" ? stack.slice(1, -1) : stack.replace(/\s/, ""); //去掉换行符
-            ret = stack.replace(/(:\d+)?:\d+$/i, ""); //去掉行号与或许存在的出错字符起始位置
+            return stack.replace(/(:\d+)?:\d+$/i, ""); //去掉行号与或许存在的出错字符起始位置
         }
-        if (!ret) {
-            var nodes = (base ? document : head).getElementsByTagName("script"); //只在head标签中寻找
-            for (var i = nodes.length, node; node = nodes[--i];) {
-                if ((base || node.className === MODULE_CLASS) && node.readyState === "interactive") {
-                    ret = node.className = node.src;  // 替换掉class，防止以后被误伤
-                }
+        // else {
+        //     console.log('NO Stack!');
+        // }
+        var nodes = (base ? document : head).getElementsByTagName("script"); //只在head标签中寻找
+        for (var i = nodes.length, node; node = nodes[--i];) {
+            if ((base || node.className === MODULE_CLASS) && node.readyState === "interactive") {
+                return node.className = node.src;  // 替换掉class，防止以后被误伤
             }
         }
-        if (!ret)
-            ret = $.slice(document.scripts).pop().src;
-        if (!ret) {
-            ret = document.location.href; // 实在不行，就取当前的URL
-        }
-        return ret ? ret.replace(/[?#].*/, '') : '';  // 去掉末尾的hash分片和查询字符串
+
+        return $.slice(document.scripts).pop().src;
     }
 
     $._getCurrentScript = getCurrentScript;
-
 
     //</editor-fold>
 
