@@ -60,3 +60,17 @@ extend()的完整实现见于 lib/core.js 的 `$.extend()` 。注意，我借用
 
 接下来，先对 $.isXXX() 系列函数挨个实现，如$.isNumber()、$.isNodeList()等等，再统一实现一个 $.type()，
 详见 lib/core.js。测试页面是 isX-type.html。
+
+
+DOM Ready
+=========
+
+这是 DOMContentLoaded 事件的别名。
+
+目前采用的策略是：
+1. 对于比较标准的浏览器，使用 DOMContentLoaded 事件；
+2. 对于比较旧的IE，则使用 Diego Perini 发现的hack，见于 lib/core.js 中的`IEContentLoaded()`函数。
+
+至于种子模块动态加载的情形，暂不处理了，以后再说。
+
+实现代码见于 lib/core.js 的 `$.ready()` 。测试页面是 dom-ready.html。

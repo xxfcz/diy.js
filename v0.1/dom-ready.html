@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>DOM ready</title>
+    <link type="text/css" rel="stylesheet" href="./lib/utest.css">
+    <script type="text/javascript" src="./lib/utest.js"></script>
+    <script type="text/javascript" src="./lib/core.js"></script>
+    <script type="text/javascript">
+        var ut;
+        $.ready(function () {
+            ut = new Utest();
+            ut.print('DOM就绪，初始化 #1');
+        });
+        $.ready(function () {
+            ut.print('DOM就绪，初始化 #2');
+        });
+        $.ready(function () {
+            ut.print('DOM就绪，初始化 #3');
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>
