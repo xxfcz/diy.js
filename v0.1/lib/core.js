@@ -437,8 +437,6 @@
      */
     function fireFactory(id, factory) {
         var mod = modules[id];
-        factory();
-/*
         var deps = mod.deps;
         var args = [];
         // 取各依赖项的导出值
@@ -447,14 +445,15 @@
                 args.push(modules[key].exports);
             }
         }
+        // 把依赖项的导出值作为本模块回调函数的参数
         var ret = factory.apply(window, args);
         if (ret !== void 0) {
             mod.exports = ret;  // 本模块导出值
             console.log(id + '模块导出值：', ret);
         }
-*/
         mod.state = STATE_LOADED;
-        //return ret;
+        // 返回本模块的导出值
+        return ret;
     }
 
     function getCurrentScript(base) {

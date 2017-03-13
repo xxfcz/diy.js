@@ -285,3 +285,55 @@ DOM Ready
     【HTML页面】我依赖 mod2.js，而它又依赖 mod1.js 。
     已成功加载： http://localhost:63342/diy.js/v0.1/js/mod1.js
 
+
+取得依赖模块的返回值，作为回调函数的参数
+--------------------------------
+
+只要修改 fireFactory()：
+
+    function fireFactory(id, factory) {
+        var mod = modules[id];
+        var deps = mod.deps;
+        var args = [];
+        // 取各依赖项的导出值
+        for (var key in deps) {
+            if (deps.hasOwnProperty(key)) {
+                args.push(modules[key].exports);
+            }
+        }
+        // 把依赖项的导出值作为本模块回调函数的参数
+        var ret = factory.apply(window, args);
+        if (ret !== void 0) {
+            mod.exports = ret;  // 本模块导出值
+            console.log(id + '模块导出值：', ret);
+        }
+        mod.state = STATE_LOADED;
+        // 返回本模块的导出值
+        return ret;
+    }
+
+
+再次查看测试页面 require3.html，可见输出中有：
+
+    http://localhost:63342/diy.js/v0.1/js/mod1.js模块导出值： 我是模块1的返回值
+    http://localhost:63342/diy.js/v0.1/js/mod2.js模块导出值： 我是模块2的返回值
+
+
+模块 mod2 有依赖项，修改它的定义，把依赖项的结果用上（从回调函数的参数中取得）：
+
+    $.define('mod2', ['http://localhost:63342/diy.js/v0.1/js/mod1.js'], function (ret) {
+        return '模块1的返回值："' + ret + '"；模块2自己的返回值mod2';
+    });
+
+测试页面 require3.html 也把依赖项的结果用上：
+
+    $.require(['http://localhost:63342/diy.js/v0.1/js/mod2.js'], function (ret) {
+        console.log('【HTML页面】我依赖 mod2.js，而它又依赖 mod1.js。取到结果：' + ret);
+    });
+
+在页面的输出中可以看到：
+
+    http://localhost:63342/diy.js/v0.1/js/mod1.js模块导出值： 我是模块1的返回值
+    http://localhost:63342/diy.js/v0.1/js/mod2.js模块导出值： 模块1的返回值："我是模块1的返回值"；模块2自己的返回值mod2
+    【HTML页面】我依赖 mod2.js，而它又依赖 mod1.js。取到结果：模块1的返回值："我是模块1的返回值"；模块2自己的返回值mod2
+
