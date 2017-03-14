@@ -337,3 +337,13 @@ DOM Ready
     http://localhost:63342/diy.js/v0.1/js/mod2.js模块导出值： 模块1的返回值："我是模块1的返回值"；模块2自己的返回值mod2
     【HTML页面】我依赖 mod2.js，而它又依赖 mod1.js。取到结果：模块1的返回值："我是模块1的返回值"；模块2自己的返回值mod2
 
+
+用不完全路径指定依赖项
+------------------
+
+    希望达到以下效果（参见测试页面 require4.html）：
+    
+    $.require(['js/mod3.js'], function (ret1) {
+        console.log('【HTML页面】使用相对路径。结果：', ret1);
+    });
+

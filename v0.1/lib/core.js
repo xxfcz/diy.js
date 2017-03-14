@@ -325,18 +325,53 @@
 
     $._loadJS = loadJS;
 
+    /**
+     * 消解URL中的符号'.'和'..'
+     * @param url
+     * @returns {string}
+     */
+    function normalizeUrl(url) {
+        url = url.replace(/\/\.\//g, '/'); //  把 /./ 替换成 /
+        var i = url.indexOf('//');
+        i = url.indexOf('/', i + 2);
+        var root = url.substring(0, i + 1); // http://www.1m1m.com/
+        url = url.substring(i + 1);
+        var dirs = url.split('/');
+        var stack = [];
+        for (i = 0; i < dirs.length; ++i) {
+            if (dirs[i] == '..' && stack.length > 0) {
+                stack.pop(); // 对于每个父目录引用'..'，都相应地返回上一级目录
+            }
+            else {
+                stack.push(dirs[i]);    // 否则，进入该级子目录
+            }
+        }
+        return root + stack.join('/');
+    }
+
+    $._normalizeUrl = normalizeUrl;
+
     function loadExternal(url) {
-        // TODO: 路径补全；别名转换
+        // TODO: 别名转换
         var src = url;
         // 不是完整URL？
         if (!/^(\w+)(\d)?:.*/.test(src)) {
             var scriptFile = getCurrentScript(true);
-            // 相对路径？相对于当前脚本的位置
-            if (src[0] !== '/') {
+
+            if (src[0] === '/') {
+                var matches = /^\w+:\/\/.*?(?=\/)/.exec(scriptFile); // 取 http://www.abc.com 这一段
+                if (matches.length === 0) {
+                    throw new Error('脚本URL居然没有根！');
+                }
+                src = matches[0] + src;
+            } else {
+                // 相对路径：解释为相对于当前脚本的位置
                 var path = scriptFile.substring(0, scriptFile.lastIndexOf('/') + 1);
                 src = path + src;
             }
         }
+
+        src = normalizeUrl(src);
 
         src = src.replace(/[?#].*/, ""); // 清除尾上的 ? # 等串
 
