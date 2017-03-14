@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
-    <title>加载器测试4：使用相对URL引用模块</title>
+    <title>加载器测试4：使用不完全URL引用模块</title>
     <link rel="stylesheet" type="text/css" href="../lib/console.css">
     <script type="text/javascript" src="../lib/console.js"></script>
     <script type="text/javascript" src="lib/core.js"></script>
     <script>
-        // 可以处理子目录形式的相对路径了
-        $.require(['js/mod3.js'], function (ret1) {
-            console.log('【HTML页面】使用相对路径。结果：', ret1);
+        $.require(['/diy.js/v0.1/js/mod1.js', 'js/mod3.js'], function (ret1, ret2) {
+            console.log('【HTML页面】使用不完全路径。结果：', ret1, ret2);
         });
     </script>
 </head>
 <body>
-<h1>加载器测试4：使用相对URL引用模块</h1>
+<h1>加载器测试4：使用不完全URL引用模块</h1>
 </body>
 </html>

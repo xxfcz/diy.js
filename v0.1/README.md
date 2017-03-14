@@ -341,9 +341,32 @@ DOM Ready
 用不完全路径指定依赖项
 ------------------
 
-    希望达到以下效果（参见测试页面 require4.html）：
+希望可以使用以下方式指定依赖项：
+
+1. js/mod1.js
+2. /diy.js/js/mod2.js
+3. ./mod2.js
+4. ../../js/mod4.js
+
+参见测试页面 require4.html：
     
-    $.require(['js/mod3.js'], function (ret1) {
-        console.log('【HTML页面】使用相对路径。结果：', ret1);
+    $.require(['/diy.js/v0.1/js/mod1.js', 'js/mod3.js'], function (ret1, ret2) {
+        console.log('【HTML页面】使用不完全路径。结果：', ret1, ret2);
     });
+
+以及测试页面 require5.html：
+
+    $.require(['../v0.1/js/mod3.js', './js/subdir/mod4.js'], function (ret1, ret2) {
+        console.log("【HTML页面】使用包含'..'、'.'的路径。结果：", ret1, ret2);
+    });
+
+
+对于不完整的（即没有 http://www.abc.com 这一部分的）URL，作如下附加处理：
+
+1. 如果是'/'开头，表明是绝对路径，从当前脚本URL中提取协议和主机，加上去即可；
+2. 如果不是'/'开头，表明是相对路径，从当前脚本URL中提取当前路径，再接上指定的相对路径即可；
+3. 消解以上结果URL中的特殊符号'.'和'..'，结果就是正常的完全URL了。
+
+详见 loadExternal() 的实现。
+
 
