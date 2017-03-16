@@ -2,11 +2,24 @@
  * Created by Administrator on 2017/2/27.
  */
 
-(function () {
-    var consoleName = 'console';   // use a name other than 'console' for debugging
+/**
+ * You can use an alias other than 'console' (which is default, of course):
+ *
+ *      <script src="js/console.js" data-alias="myConsole" data-forced="true"></script>
+ *
+ *
+ * You can also force the browser to use our own implementation, with the name of 'console':
+ *
+ *      <script src="js/console.js" data-forced="true"></script>
+ */
 
-    if (typeof window[consoleName] !== 'undefined')
+(function () {
+    var script = getCurrentScriptNode();
+    var consoleName = script.getAttribute('data-alias') || 'console';
+    var forced = script.getAttribute('data-forced') == 'true';
+    if (!forced && (typeof window[consoleName] !== 'undefined')) {
         return;
+    }
 
     var logs = [];
 
@@ -129,6 +142,16 @@
         }
         return element;
     };
+
+    function getCurrentScriptNode() {
+        var nodes = document.head.getElementsByTagName("script"); //只在head标签中寻找
+        for (var i = nodes.length, node; node = nodes[--i];) {
+            if (node.readyState === "interactive") {
+                return node;
+            }
+        }
+        return document.scripts[document.scripts.length - 1];
+    }
 
     var setup = function () {
         var consoleRoot = util.createElement('div', { className: 'console' });

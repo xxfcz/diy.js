@@ -8,10 +8,10 @@
     <script type="text/javascript">
         var hasBuiltInConsole = typeof window.console !== 'undefined';
     </script>
-    <script src="lib/console.js"></script>
+    <script src="lib/console.js" data-forced="true"></script>
     <script>
         if (hasBuiltInConsole)
-            document.write('这个浏览器有内置控制台，请按F12看输出。<br/>要看模拟效果，可使用IE6-9。<hr/>');
+            document.write('这个浏览器有内置控制台，请按F12看输出。<br/>要看模拟效果，可使用IE6-9。或者对 script 标签加上属性：data-forced="true"<hr/>');
         else
             document.write('使用模拟的console。<hr/>');
 
