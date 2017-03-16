@@ -1,8 +1,26 @@
-.console.log {
-  color: gray; }
-.console.info {
-  color: blue; }
-.console.error {
-  color: red; }
+.console {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40em;
+  border: 1px solid #aaa;
+  background: #ededed;
+  font-size: 14px;
+  padding: 10px; }
+  .console .console-content {
+    padding-top: 0.75em; }
+  .console a {
+    padding: 0 0.5em; }
+    .console a.close {
+      position: absolute;
+      right: 0.75em; }
+  .console .log {
+    color: black; }
+  .console .info {
+    color: blue; }
+  .console .warn {
+    color: orange; }
+  .console .error {
+    color: red; }
 
 /*# sourceMappingURL=console.css.map */

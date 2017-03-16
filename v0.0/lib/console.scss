@@ -1,13 +1,39 @@
 .console{
-   &.log{
-      color: gray;
+   position: absolute;
+   top: 0;
+   right: 0;
+   width: 40em;
+   border: 1px solid #aaa;
+   background: #ededed;
+   font-size: 14px;
+   padding: 10px;
+
+   .console-content{
+      padding-top: 0.75em;
    }
 
-   &.info{
+   a{
+      padding: 0 0.5em;
+
+      &.close{
+         position: absolute;
+         right: 0.75em;
+      }
+   }
+
+   .log{
+      color: black;
+   }
+
+   .info{
       color: blue;
    }
 
-   &.error{
+   .warn{
+      color: orange;
+   }
+
+   .error{
       color: red;
    }
 }

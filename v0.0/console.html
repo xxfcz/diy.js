@@ -15,13 +15,17 @@
         else
             document.write('使用模拟的console。<hr/>');
 
-        console.log('这一行是在 head 中输出的。');
+        console1.log('这一行是在 head 中输出的。');
     </script>
 </head>
 <body>
 <script>
-    console.log('我也能用 console.log() 了！');
-    console.info('这一行是用 info() 输出的。');
+    console1.log('我也能用 console.log() 了！');
+    console1.info('这一行是用 info() 输出的。');
+    console1.warn('这一行是用 warn() 输出的。');
+    console1.error('这一行是用 error() 输出的。');
+    console1.log('输出超长的一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一' +
+        '一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一一行');
 </script>
 </body>
 </html>

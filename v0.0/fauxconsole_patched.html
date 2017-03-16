@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>修正的 fauxconsole</title>
+    <link rel="stylesheet" type="text/css" href="lib/fauxconsole.css">
+    <script src="lib/fauxconsole.js"></script>
+    <script>
+        function foo() {
+            console1.log('哈哈！');
+        }
+
+        if (window.addEventListener)
+            window.addEventListener('DOMContentLoaded', foo);
+        else
+            window.attachEvent('onload', foo);
+    </script>
+</head>
+<body>
+<div>请在IE6-8中查看此页面。</div>
+</body>
+</html>
