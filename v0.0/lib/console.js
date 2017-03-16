@@ -3,7 +3,7 @@
  */
 
 (function () {
-    var consoleName = 'console1';   // use a name other than 'console' for debugging
+    var consoleName = 'console';   // use a name other than 'console' for debugging
 
     if (typeof window[consoleName] !== 'undefined')
         return;
