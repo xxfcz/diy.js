@@ -1,5 +1,5 @@
 /**
- * Created by Administrator on 2017/2/27.
+ * Created by 肖雪峰 on 2017/2/27.
  */
 
 /**
@@ -8,7 +8,7 @@
  *      <script src="js/console.js" data-alias="myConsole" data-forced="true"></script>
  *
  *
- * You can also force the browser to use our own implementation, with the name of 'console':
+ * You can also force the browser to use our own implementation, with the default name of 'console':
  *
  *      <script src="js/console.js" data-forced="true"></script>
  */
@@ -231,7 +231,7 @@
                     case 'error':
                         console2.error(log.text);
                         break;
-                    // TODO: 有没有嗅到 bad smile?
+                    // TODO: 有没有嗅到 bad smell?
                     default:
                         break;
                 }
