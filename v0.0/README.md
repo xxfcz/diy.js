@@ -1,5 +1,6 @@
 # 这是diy.js前端框架的第零步。
 
+
 在这一步中，将对较低版本的IE提供三个基础构件/工具：
 
 1. console
@@ -7,8 +8,8 @@
 3. JSON
 
 
-console
-=======
+# 1. console
+
 
 IE6-9 都没有`console`，需要补一个。
 
@@ -81,8 +82,8 @@ body中的输出正常，但是head中的会报错：
 等到 `document` 就绪了再一并输出。详见 lib\console.js 和 console.html。
 
 
-单元测试框架
-==========
+# 2. 单元测试框架
+
 
 首先想到的自然是Jasmine，当然也可以用mocha，或者别的。
 
@@ -158,8 +159,8 @@ body中的输出正常，但是head中的会报错：
 完整示例位于 utest.html。
 
 
-JSON
-====
+# 3. JSON
+
 
 IE6-7 没有 JSON 对象，我们的简陋测试框架如果要输出对象内容就不方便了，所以需要补上。
 
