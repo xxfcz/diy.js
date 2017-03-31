@@ -525,6 +525,9 @@
         var nodes = (base ? document : head).getElementsByTagName("script"); //只在head标签中寻找
         for (var i = nodes.length, node; node = nodes[--i];) {
             if ((base || node.className === MODULE_CLASS) && node.readyState === "interactive") {
+                if (node.src === '') {      // for IE8-9
+                    return window.location.href;
+                }
                 return node.className = node.src;  // 替换掉class，防止以后被误伤
             }
         }

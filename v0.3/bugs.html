@@ -3,9 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
-    <title>$Title$</title>
+    <title>各浏览器中JavaScript的Bugs</title>
+    <link rel="stylesheet" type="text/css" href="../lib/console.css">
+    <link rel="stylesheet" type="text/css" href="../lib/utest.css">
+    <script src="../lib/console.js"></script>
+    <script src="../lib/utest.js"></script>
+    <script src="lib/core.js"></script>
 </head>
 <body>
-$END$
+<script>
+
+    $.require(['js/tests.js'], function (runTests) {
+        var ut = new Utest();
+        ut.print('没有应用 lang_fix 的时候：');
+        runTests(ut);
+    });
+
+    $.require(['lib/lang_fix.js', 'js/tests.js'], function (fix, runTests) {
+        var ut = new Utest();
+        ut.print('******************************************************************');
+        ut.print('应用了 lang_fix 之后：');
+        runTests(ut);
+    })
+
+</script>
 </body>
 </html>
