@@ -82,12 +82,38 @@ body中的输出正常，但是head中的会报错：
 等到 `document` 就绪了再一并输出。详见 lib\console.js 和 console.html。
 
 
-# 2. 单元测试框架
+# 2. JSON
+
+
+IE6-7 没有 JSON 对象，我们的简陋测试框架如果要输出对象内容就不方便了，所以需要补上。
+
+首先找到现成的 [JSON-js](https://github.com/douglascrockford/JSON-js)，试验后发现，它没有解决IE6-8 for-in 的问题。
+
+关于 IE6-8 for-in 的问题，见于 for-in.html。简单来说，如果一个自定义对象是这样的：
+
+    var o = {
+        x: 1,
+        y: 2,
+        toString: '(x: 1, y: 2)'
+    };
+
+那么， `for(var i in o)` 将只会枚举出 x 和 y, 而不会遇见 toString 。
+
+JSON-js 的测试，见于 json2.html，输出如下：
+
+    JSON.stringify 结果：{"x":10,"y":20}
+
+打了补丁后的 JSON-js 见于 lib/json2.js。测试文件是 json2_patched.html，输出如下：
+
+    JSON.stringify 结果：{"x":10,"y":20,"toString":"(x: 1, y: 2)"}
+
+
+# 3. 单元测试框架
 
 
 首先想到的自然是Jasmine，当然也可以用mocha，或者别的。
 
-不过，试了一下Jasmine，发现它不支持IE6、7。详见JasminRunner.html。
+不过，试了一下 Jasmine 2.4.1，发现它不支持IE6、7。详见JasminRunner.html。
 又试了一下mocha，它甚至不支持IE8。详见mocha-runner.html。
 
 失望之余，只有撸起袖子自己造轮子。
@@ -159,28 +185,7 @@ body中的输出正常，但是head中的会报错：
 完整示例位于 utest.html。
 
 
-# 3. JSON
+# 4. 旧版的 Jasmine
 
 
-IE6-7 没有 JSON 对象，我们的简陋测试框架如果要输出对象内容就不方便了，所以需要补上。
-
-首先找到现成的 [JSON-js](https://github.com/douglascrockford/JSON-js)，试验后发现，它没有解决IE6-8 for-in 的问题。
-
-关于 IE6-8 for-in 的问题，见于 for-in.html。简单来说，如果一个自定义对象是这样的：
-
-    var o = {
-        x: 1,
-        y: 2,
-        toString: '(x: 1, y: 2)'
-    };
-
-那么， `for(var i in o)` 将只会枚举出 x 和 y, 而不会遇见 toString 。
-
-JSON-js 的测试，见于 json2.html，输出如下：
-
-    JSON.stringify 结果：{"x":10,"y":20}
-
-打了补丁后的 JSON-js 见于 lib/json2.js。测试文件是 json2_patched.html，输出如下：
-
-    JSON.stringify 结果：{"x":10,"y":20,"toString":"(x: 1, y: 2)"}
-
+最近在寻找合适的polyfill，在 [ES5-DOM-SHIM](https://github.com/termi/ES5-DOM-SHIM) 中发现了一个兼容 IE6 的 Jasmine。
