@@ -5,18 +5,49 @@
 	<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
 
 	<link rel="shortcut icon" type="image/png" href="vendor/jasmine-2.4.1/jasmine_favicon.png">
-	<link rel="stylesheet" href="vendor/jasmine-2.4.1/jasmine.css">
+	<link rel="stylesheet" href="vendor/jasmine/jasmine.css">
+	<!--<script src="lib/json2.js"></script>-->
+	<script src="vendor/jasmine/jasmine.js"></script>
+	<script src="vendor/jasmine/jasmine-html.js"></script>
+	<!--<script src="vendor/jasmine/json2.js"></script>-->
 
-	<script src="vendor/jasmine-2.4.1/jasmine.js"></script>
-	<script src="vendor/jasmine-2.4.1/jasmine-html.js"></script>
-	<script src="vendor/jasmine-2.4.1/boot.js"></script>
-
-	<title>Jasmine 实验</title>
+	<title>旧版 Jasmine 实验</title>
 
 	<!-- include source files here... -->
 
 	<!-- include spec files here... -->
 	<script src="js/test1.js"></script>
+
+
+	<script type="text/javascript">
+        (function() {
+            var jasmineEnv = jasmine.getEnv();
+            jasmineEnv.updateInterval = 1000;
+
+            var trivialReporter = new jasmine.TrivialReporter();
+
+            jasmineEnv.addReporter(trivialReporter);
+
+            jasmineEnv.specFilter = function(spec) {
+                return trivialReporter.specFilter(spec);
+            };
+
+            var currentWindowOnload = window.onload;
+
+            window.onload = function() {
+                if (currentWindowOnload) {
+                    currentWindowOnload();
+                }
+                execJasmine();
+            };
+
+            function execJasmine() {
+                jasmineEnv.execute();
+            }
+
+        })();
+	</script>
+
 </head>
 <body>
 
