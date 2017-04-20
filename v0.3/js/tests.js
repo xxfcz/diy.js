@@ -37,6 +37,25 @@ $.define('tests', [], function () {
 
         ut.print('==== Number ====');
         ut.assert(0.9.toFixed(0) === '1', 'Number#toFixed() 应该四舍五入');
+
+        ut.print('==== Function ====');
+        ut.assert(!!Function.prototype.bind, 'Function#bind() 有实现');
+        if (Function.prototype.bind) {
+            function f1(x, y, z) {
+                return x + y + z;
+            }
+
+            var g = f1.bind({}, 1, 2);
+            ut.assert(g(3) === 6, 'Function#bind() 可以绑定参数');
+
+            function f2(n) {
+                return this.x + n;
+            }
+
+            var obj = { x: 10 };
+            g = f2.bind(obj);
+            ut.assert(g(5) === 15, 'Function#bind() 可以绑定this和参数');
+        }
     }
 
     return run;
