@@ -3,7 +3,7 @@
  */
 
 
-$.define('tests', [], function () {
+$.define('lang_bugs', [], function () {
 
     function run(ut) {
         ut.print('==== Array ====');

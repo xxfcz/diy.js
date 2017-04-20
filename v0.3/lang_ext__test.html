@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>lang_ext 测试</title>
+    <link rel="stylesheet" type="text/css" href="../lib/console.css">
+    <link rel="stylesheet" type="text/css" href="../lib/utest.css">
+    <script src="../lib/utest.js"></script>
+    <script src="../lib/console.js"></script>
+    <script src="lib/core.js"></script>
+    <script>
+        $.require(['lib/lang_ext.js'], function () {
+            var ut = new Utest();
+
+            (function () {
+                var a = [1, 2, 3];
+                var b = [1, 2, 3];
+                ut.assert($.equal(a, b), '$.equal() 判断数组相等');
+                var c = [1, 2];
+                ut.assert(!$.equal(a, c), '$.equal() 判断数组不等');
+                ut.assert($.equal([1, [2, 3], 4], [1, [2, 3], 4]), '$.equal() 判断嵌套的数组');
+            })();
+
+            var a = [1, [2, 3], 4];
+            var b = [5, 6];
+            var concat = $.bind.apply([].concat);
+            var c = concat(a, b);
+            ut.assert($.equal(c, [1, [2, 3], 4, 5, 6]), '便捷绑定后的 concat(a, b)');
+            c = concat(b, a);
+            ut.assert($.equal(c, [5, 6, 1, 2, 3, 4]), '便捷绑定后的 concat(b, a)');
+
+            ut.assert(!$.equal(concat([], [1,[2,[3]]]), [1,2,3]), 'concat() 对第2个参数的展开，只能达到一层深度');
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>
