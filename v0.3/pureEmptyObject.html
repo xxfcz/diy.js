@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>纯空对象</title>
+    <link rel="stylesheet" type="text/css" href="../lib/console.css">
+    <script src="../lib/console.js"></script>
+    <script>
+
+        function getPureEmptyObjectIE() {
+            var doc = new ActiveXObject('htmlfile');
+            doc.write('<script><\/script>');
+            doc.close();
+            var obj = doc.parentWindow.Object;
+            if (!obj || obj === Object) {
+                return;
+            }
+
+            var name, names = ['constructor', 'hasOwnProperty', 'isPrototypeOf',
+                'propertyIsEnumerable', 'toLocaleString', 'toString', 'valueOf'];
+            while (name = names.pop())
+                delete obj.prototype[name];
+            return obj;
+        }
+
+
+        var _;
+
+        try {
+            _ = Object.create(null);
+        }
+        catch (ex) {
+            _ = getPureEmptyObjectIE();
+        }
+        console.log(_);
+    </script>
+</head>
+<body>
+
+</body>
+</html>
