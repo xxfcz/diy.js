@@ -39,6 +39,8 @@ $.define('lang_bugs', [], function () {
         ut.assert(0.9.toFixed(0) === '1', 'Number#toFixed() 应该四舍五入');
 
         ut.print('==== Function ====');
+        ut.assert(typeof Function.prototype.apply === 'function', 'Function#apply() 有实现');
+        ut.assert(typeof Function.prototype.call === 'function', 'Function#call() 有实现');
         ut.assert(!!Function.prototype.bind, 'Function#bind() 有实现');
         if (Function.prototype.bind) {
             function f1(x, y, z) {
@@ -67,6 +69,19 @@ $.define('lang_bugs', [], function () {
                 ut.assert(false, '可以执行 Object.create(null)');
             }
         })();
+
+        ut.print('==== Date ====');
+        ut.assert(typeof Date.now === 'function', 'Date.now() 有实现');
+        ut.assert(typeof Date.prototype.toISOString === 'function', 'Date#toISOString() 有实现');
+        ut.assert(typeof Date.prototype.toJSON === 'function', 'Date#toJSON() 有实现');
+        (function () {
+            var d = new Date();
+            ut.assert(d.getYear() +1900 === d.getFullYear(), 'Date#getYear() + 1900 == Date#getFullYear()');
+            d.setYear(99);
+            ut.assert(1999 === d.getFullYear(), 'Date#setYear()');
+        })();
+
+
     }
 
     return run;
