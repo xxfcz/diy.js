@@ -93,8 +93,12 @@ $.define('lang_ext', ['lang_fix.js'], function () {
                 var k = 0;
                 // 用更多的实参去替换 argsBound 里的占位符 _
                 argsPerCall.forEach(function (a, i) {
-                    if (a === $._)
-                        argsPerCall[i] = moreArgs[k++];
+                    if (a === $._) {
+                        if(k<moreArgs.length)
+                            argsPerCall[i] = moreArgs[k++];
+                        else
+                            argsPerCall[i] = undefined; // 未提供实参的占位符 替换为 undefined
+                    }
                 });
                 return fn.apply(null, argsPerCall);
             }
