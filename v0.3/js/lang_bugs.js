@@ -56,6 +56,17 @@ $.define('lang_bugs', [], function () {
             g = f2.bind(obj);
             ut.assert(g(5) === 15, 'Function#bind() 可以绑定this和参数');
         }
+        ut.assert(!!Object.create, 'Object#create() 有实现');
+        if (typeof Object.create === 'function') (function () {
+            var peo;
+            try {
+                peo = Object.create(null);
+                ut.assert(typeof peo.toString === 'undefined', '纯空对象 无 toString 属性');
+            }
+            catch (ex) {
+                ut.assert(false, '可以执行 Object.create(null)');
+            }
+        })();
     }
 
     return run;

@@ -33,7 +33,17 @@
         catch (ex) {
             _ = getPureEmptyObjectIE();
         }
-        console.log(_);
+        console.log('_:', _);
+        console.log('typeof _:', typeof _);
+        console.log('typeof _.toString:', typeof _.toString);
+        try {
+            console.log('try calling _.toString() ...');
+            var s = _.toString();
+            console.log(s);
+        }
+        catch (ex) {
+            console.error(ex.message);
+        }
     </script>
 </head>
 <body>
