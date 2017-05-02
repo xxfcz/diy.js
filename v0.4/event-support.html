@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+    <title>事件支持</title>
+    <link type="text/css" rel="stylesheet" href="../lib/console.css">
+    <script src="../lib/console.js" data-forced="true"></script>
+    <script src="lib/core.js"></script>
+    <script>
+        console.log('click:', 'onclick' in document.documentElement);
+        console.log('click2:', 'onclick2' in document.documentElement);
+        console.log('reset in document.documentElement:', 'onreset' in document.documentElement);
+        console.log('reset in input:', 'onreset' in document.createElement('input'));
+
+        console.log('*************************************************');
+
+        console.log('click: ', $.isEventSupported('click'));
+        console.log('mouseenter: ', $.isEventSupported('mouseenter'));
+        console.log('mouseleave: ', $.isEventSupported('keydown:'));
+        console.log('mouseover: ', $.isEventSupported('mouseover'));
+        console.log('mouseout: ', $.isEventSupported('mouseout:'));
+        console.log('keydown: ', $.isEventSupported('keydown'));
+        console.log('keyup: ', $.isEventSupported('keyup'));
+        console.log('keypress: ', $.isEventSupported('keypress'));
+        console.log('select: ', $.isEventSupported('select'));
+        console.log('change: ', $.isEventSupported('change'));
+    </script>
+</head>
+<body>
+
+</body>
+</html>

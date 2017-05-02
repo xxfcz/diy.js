@@ -525,6 +525,9 @@
         var nodes = (base ? document : head).getElementsByTagName("script"); //只在head标签中寻找
         for (var i = nodes.length, node; node = nodes[--i];) {
             if ((base || node.className === MODULE_CLASS) && node.readyState === "interactive") {
+                if (node.src === '') {      // for IE8-9
+                    return window.location.href;
+                }
                 return node.className = node.src;  // 替换掉class，防止以后被误伤
             }
         }
@@ -536,8 +539,26 @@
 
     //</editor-fold>
 
-    // 浏览器检测
-    $.browser = (function () {
 
+    // 来源：http://thinkweb2.com/projects/prototype/detecting-event-support-without-browser-sniffing/
+    $.isEventSupported = (function(){
+        var TAGNAMES = {
+            'select':'input','change':'input',
+            'submit':'form','reset':'form',
+            'error':'img','load':'img','abort':'img'
+        };
+        function isEventSupported(eventName) {
+            var el = document.createElement(TAGNAMES[eventName] || 'div');
+            eventName = 'on' + eventName;
+            var isSupported = (eventName in el);
+            if (!isSupported) {
+                el.setAttribute(eventName, 'return;');
+                isSupported = typeof el[eventName] == 'function';
+            }
+            el = null;
+            return isSupported;
+        }
+        return isEventSupported;
     })();
+
 })();
